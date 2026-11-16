@@ -1,249 +1,353 @@
-# EventHub - Full Stack Event Management System
+<div align="center">
 
-[![EventHub CI Pipeline](https://github.com/swayammankar1-hub/FSD-Lab-Event-Management/actions/workflows/ci.yml/badge.svg)](https://github.com/swayammankar1-hub/FSD-Lab-Event-Management/actions)
-[![Frontend Deployed on Vercel](https://img.shields.io/badge/Frontend-Vercel-black?logo=vercel)](https://YOUR-FRONTEND.vercel.app/)
-[![Backend Deployed on Render](https://img.shields.io/badge/Backend-Render%20Container-46E3B7?logo=render)](https://YOUR-BACKEND.onrender.com/)
-[![Docker Containerized](https://img.shields.io/badge/Docker-Containerized-2496ED?logo=docker)](https://github.com/swayammankar1-hub/FSD-Lab-Event-Management)
+# 🎟️ EventHub
 
-EventHub is a modern, production-ready event management platform built using the MERN stack (MongoDB, Express.js, React, Node.js), containerized with Docker, automated with GitHub Actions CI/CD, and enhanced with real-time notifications via Socket.IO.
+### Full-Stack Event Management Platform
 
----
+A production-style MERN application with role-based access control, real-time notifications, Docker containerization and a GitHub Actions CI pipeline.
 
-## 🌐 Live Deployments
+[![CI](https://github.com/swayammankar1-hub/FSD-Lab-Event-Management/actions/workflows/ci.yml/badge.svg)](https://github.com/swayammankar1-hub/FSD-Lab-Event-Management/actions)
+![Node](https://img.shields.io/badge/Node.js-20-339933?logo=node.js&logoColor=white)
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)
+![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-47A248?logo=mongodb&logoColor=white)
+![Socket.IO](https://img.shields.io/badge/Socket.IO-Realtime-010101?logo=socket.io&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)
 
-| Component | Platform | Deployment Type | Live URL |
-| :--- | :--- | :--- | :--- |
-| **Frontend Application** | **Vercel** | React / Vite SPA on Edge CDN | 👉 [https://YOUR-FRONTEND.vercel.app/](https://YOUR-FRONTEND.vercel.app/) |
-| **Backend API & WebSockets** | **Render** | Docker Container Web Service | 👉 [https://YOUR-BACKEND.onrender.com/](https://YOUR-BACKEND.onrender.com/) |
-| **API Health Check** | **Render** | Live Status Endpoint | 👉 [https://YOUR-BACKEND.onrender.com/api/health](https://YOUR-BACKEND.onrender.com/api/health) |
+</div>
 
 ---
 
-## 🚀 Key Features
+## Table of Contents
 
-### 1. Authentication & Role-Based Access Control (RBAC)
-- Secure user registration and login with `bcryptjs` password hashing.
-- Stateless authentication using JSON Web Tokens (HS256 JWT).
-- Role segregation:
-  - **`user`**: Can explore events, register for events, cancel bookings, and receive live notifications.
-  - **`admin`**: Full access to Admin Dashboard, event creation, live edits, cancellations, and attendee management.
-- Protected client-side routing with automatic session recovery and unauthorized redirects.
-
-### 2. Event Discovery & Management
-- Search events dynamically by keyword in title or description.
-- Filter events by location and date ranges.
-- Full Admin CRUD operations with input validation.
-- Automatic cascade deletion of attendee registrations when an event is cancelled.
-
-### 3. Real-Time Notifications (Socket.IO)
-- Instant WebSocket event broadcasts whenever an admin creates, updates, or cancels an event.
-- Interactive notification bell in the navbar displaying unread count badges.
-- Scrollable notification dropdown with live timestamps, connection status indicators, and clear actions.
-
-### 4. Containerization & DevOps
-- Fully containerized with multi-stage Docker builds.
-- Local multi-service orchestration with **Docker Compose**.
-- Production-grade **Nginx** reverse proxy for the frontend container.
-- Automated Continuous Integration (CI) pipeline via **GitHub Actions** checking backend syntax and frontend build integrity.
-- Automated Continuous Deployment (CD) connected to Render and Vercel.
+1. [Overview](#overview)
+2. [Key Features](#key-features)
+3. [Tech Stack](#tech-stack)
+4. [Architecture](#architecture)
+5. [Project Structure](#project-structure)
+6. [Getting Started](#getting-started)
+   - [Prerequisites](#prerequisites)
+   - [Environment Variables](#environment-variables)
+   - [Option A: Docker (Recommended)](#option-a-docker-recommended)
+   - [Option B: Manual Setup](#option-b-manual-setup)
+   - [Creating an Admin Account](#creating-an-admin-account)
+7. [Application Routes](#application-routes)
+8. [API Reference](#api-reference)
+9. [Real-Time Events](#real-time-events-socketio)
+10. [Data Models](#data-models)
+11. [Security](#security)
+12. [CI/CD Pipeline](#cicd-pipeline)
+13. [Deployment](#deployment)
+14. [Documentation](#documentation)
+15. [Author](#author)
 
 ---
 
-## 🛠️ Technology Stack
+## Overview
+
+**EventHub** lets organizations publish events and lets attendees discover and book them. Admins manage the full event lifecycle, and every change is pushed to connected users instantly through WebSockets, so nobody has to refresh the page to see what's new.
+
+The project was built for the **Full Stack Development Lab** and covers the full path from application code to a deployable, containerized system with automated checks.
+
+## Key Features
+
+### 🔐 Authentication & Authorization
+- Registration and login with **bcrypt** password hashing.
+- Stateless sessions using **JSON Web Tokens (JWT)**.
+- Two roles: **`user`** and **`admin`**, enforced on the server by middleware and on the client by protected routes.
+- Session recovery on page reload and automatic redirect for unauthorized access.
+
+### 📅 Event Discovery
+- Browse all upcoming events on a public page.
+- Keyword search across title and description.
+- Filter by **location** and **date range**.
+
+### 🧑‍💼 Admin Dashboard
+- Create, edit and cancel events with server-side validation.
+- View all attendee registrations.
+- Cancelling an event automatically removes its registrations (cascade delete).
+
+### 🎫 Registrations
+- One-click registration for an event.
+- Duplicate bookings for the same event are blocked by a unique database index.
+- Personal **My Registrations** page with cancellation.
+
+### 🔔 Real-Time Notifications
+- Socket.IO broadcasts whenever an event is **created**, **updated** or **deleted**.
+- Notification bell in the navbar with an unread badge, a scrollable dropdown, timestamps, connection status and a clear action.
+
+### 🚢 DevOps
+- Multi-stage **Docker** builds for client and server.
+- **Docker Compose** orchestration with an Nginx-served frontend.
+- **GitHub Actions** pipeline for backend checks, frontend lint and production build.
+- Render blueprint (`render.yaml`) and Vercel rewrites (`vercel.json`) for cloud deployment.
+
+## Tech Stack
 
 | Layer | Technologies |
 | :--- | :--- |
-| **Frontend** | React 19, Vite, Tailwind CSS, React Router v7, Socket.IO Client (`socket.io-client`) |
-| **Backend** | Node.js (v20), Express.js, Socket.IO (`socket.io`), JWT (`jsonwebtoken`), bcryptjs |
-| **Database** | MongoDB Atlas with Mongoose ODM |
-| **Containerization** | Docker, Docker Compose, Multi-stage builds, Alpine Linux, Nginx |
-| **CI / CD** | GitHub Actions (`.github/workflows/ci.yml`) |
-| **Hosting & Cloud** | Vercel (Edge CDN) & Render (Docker Web Service) |
+| **Frontend** | React 19, Vite, Tailwind CSS, React Router v7, `socket.io-client` |
+| **Backend** | Node.js 20, Express, Socket.IO, `jsonwebtoken`, `bcryptjs`, `cors`, `dotenv` |
+| **Database** | MongoDB (Atlas) with Mongoose ODM |
+| **Containers** | Docker, Docker Compose, Alpine Linux, Nginx |
+| **CI/CD** | GitHub Actions |
+| **Hosting** | Vercel (frontend), Render (backend) |
 
----
+## Architecture
 
-## 📁 Repository Structure
+```text
+┌──────────────────────┐        HTTPS / REST         ┌──────────────────────────┐
+│   React SPA (Vite)   │ ──────────────────────────▶ │  Express API  (Node 20)  │
+│  Tailwind · Router   │                             │  JWT auth · RBAC         │
+│                      │ ◀────── WebSocket ───────── │  Socket.IO server        │
+└──────────────────────┘     (event:* broadcasts)    └────────────┬─────────────┘
+                                                                  │ Mongoose
+                                                                  ▼
+                                                      ┌──────────────────────┐
+                                                      │   MongoDB Atlas      │
+                                                      │ Users · Events ·     │
+                                                      │ Registrations        │
+                                                      └──────────────────────┘
+```
+
+In Docker, Nginx serves the built SPA, falls back to `index.html` for client-side routes, and proxies `/api/` and `/socket.io/` to the backend container.
+
+## Project Structure
 
 ```text
 FSD-Lab-Event-Management/
-├── .github/
-│   └── workflows/
-│       └── ci.yml                     # GitHub Actions CI workflow
-├── docs/                              # Full Lab Manuals & Experiment Reports
-│   ├── README.md                      # Documentation Index
-│   ├── EXPERIMENT_7_SOCKET_IO_REALTIME.md
-│   └── EXPERIMENT_8_CONTAINERIZATION_AND_DEPLOYMENT.md
-├── docker-compose.yml                 # Multi-container orchestration (Backend + Frontend)
-├── render.yaml                        # Render Infrastructure-as-Code Blueprint
-├── .gitignore
-├── README.md
+├── .github/workflows/ci.yml          # CI pipeline
+├── docs/                             # Lab reports (Experiments 7 and 8)
+├── docker-compose.yml                # Frontend + backend orchestration
+├── render.yaml                       # Render blueprint
 └── Event-Management-system/
-    ├── client/
+    ├── client/                       # React frontend
     │   ├── src/
-    │   │   ├── components/
-    │   │   │   ├── Navbar.jsx         # Responsive Navigation Bar
-    │   │   │   ├── NotificationBell.jsx # Real-time Socket.IO notification component
-    │   │   │   ├── ProtectedRoute.jsx # Client-side route guard
-    │   │   │   └── EventCard.jsx
-    │   │   ├── pages/
-    │   │   │   ├── AdminDashboard.jsx # Admin management & attendee review
-    │   │   │   ├── Events.jsx         # Public events discovery & filtering
-    │   │   │   ├── Home.jsx           # Landing page
-    │   │   │   ├── Login.jsx          # User login
-    │   │   │   ├── MyRegistrations.jsx# Personal registration tracker
-    │   │   │   └── Register.jsx       # User registration
-    │   │   ├── services/
-    │   │   │   └── api.js             # API request service layer
-    │   │   ├── App.jsx                # Application routes
-    │   │   └── main.jsx               # Entry point
-    │   ├── Dockerfile                 # Multi-stage Nginx container build
-    │   ├── nginx.conf                 # Nginx SPA fallback & proxy configuration
-    │   ├── vercel.json                # Vercel SPA rewrites & API proxy
-    │   ├── .dockerignore
-    │   ├── package.json
-    │   └── vite.config.js
-    │
-    └── server/
-        ├── config/
-        │   └── db.js                  # MongoDB Atlas connection
-        ├── controllers/
-        │   ├── authController.js      # Auth logic (Register, Login, Me)
-        │   ├── eventController.js     # Event CRUD & Socket.IO emits
-        │   └── registrationController.js
-        ├── middleware/
-        │   ├── authMiddleware.js      # protect & adminOnly middleware
-        │   └── errorMiddleware.js     # 404 & error handlers
-        ├── models/
-        │   ├── User.js                # User schema (roles: user, admin)
-        │   ├── Event.js               # Event schema
-        │   └── Registration.js        # Registration schema
-        ├── routes/
-        │   ├── authRoutes.js
-        │   ├── eventRoutes.js
-        │   └── registrationRoutes.js
-        ├── Dockerfile                 # Node.js Alpine container build
-        ├── .dockerignore
-        ├── package.json
-        └── server.js                  # Express + HTTP + Socket.IO server
+    │   │   ├── components/           # Navbar, NotificationBell, EventCard, Modal, Button, ProtectedRoute, Loading
+    │   │   ├── pages/                # Home, Events, Login, Register, MyRegistrations, AdminDashboard
+    │   │   ├── context/              # AuthContext
+    │   │   ├── hooks/                # useAuth
+    │   │   ├── services/api.js       # API service layer
+    │   │   ├── App.jsx               # Route definitions
+    │   │   └── main.jsx              # Entry point
+    │   ├── Dockerfile                # Multi-stage build, served by Nginx
+    │   ├── nginx.conf                # SPA fallback and API/WebSocket proxy
+    │   └── vercel.json               # Vercel rewrites
+    └── server/                       # Express backend
+        ├── config/db.js              # MongoDB connection
+        ├── controllers/              # auth, event, registration logic
+        ├── middleware/               # protect, adminOnly, error handlers
+        ├── models/                   # User, Event, Registration
+        ├── routes/                   # auth, event, registration routes
+        ├── utils/generateToken.js    # JWT helper
+        ├── Dockerfile
+        └── server.js                 # Express + Socket.IO entry point
 ```
 
----
+## Getting Started
 
-## ⚡ Running the Project with Docker (Recommended)
+### Prerequisites
 
-Run the entire full-stack application (Frontend + Backend + Network) with a single command:
+- **Node.js 20+** and npm
+- A **MongoDB** connection string ([MongoDB Atlas](https://www.mongodb.com/atlas) free tier works well)
+- **Docker Desktop** (only for the Docker option)
+
+### Environment Variables
+
+**Server**: create `Event-Management-system/server/.env`
+
+| Variable | Required | Description | Example |
+| :--- | :---: | :--- | :--- |
+| `MONGODB_URI` | ✅ | MongoDB connection string | `mongodb+srv://user:pass@cluster.mongodb.net/eventhub` |
+| `JWT_SECRET` | ✅ | Secret used to sign tokens (the server refuses to start without it) | a long random string |
+| `JWT_EXPIRES_IN` | | Token lifetime | `1d` |
+| `PORT` | | API port (default `5000`) | `5000` |
+| `CLIENT_ORIGIN` | | Allowed CORS origin for the frontend | `http://localhost:5173` |
+
+**Client**: create `Event-Management-system/client/.env` (optional for local development)
+
+| Variable | Description | Default |
+| :--- | :--- | :--- |
+| `VITE_API_URL` | Backend base URL. When unset, requests go to the same origin and are proxied. | none |
+| `VITE_SOCKET_URL` | Socket.IO server URL | `http://localhost:5000` |
+
+> ⚠️ Never commit `.env` files. They are already listed in `.gitignore`.
+
+### Option A: Docker (Recommended)
+
+Create the server `.env` first (see above), then from the repository root:
 
 ```bash
-# 1. Build and start containers in background
-docker compose up -d --build
-
-# 2. Check running container status
-docker ps
-
-# 3. View live combined logs
-docker compose logs -f
-
-# 4. Stop all containers
-docker compose down
+docker compose up -d --build     # build and start both services
+docker compose logs -f           # follow logs
+docker compose down              # stop and remove containers
 ```
 
-* **Frontend:** Open [http://localhost:5173](http://localhost:5173) in your browser.
-* **Backend:** Accessible at [http://localhost:5000](http://localhost:5000).
+| Service | URL |
+| :--- | :--- |
+| Frontend | http://localhost:5173 |
+| Backend API | http://localhost:5000 |
+| Health check | http://localhost:5000/api/health |
 
----
+### Option B: Manual Setup
 
-## 💻 Manual Local Development Setup
-
-### 1. Clone Repository
 ```bash
+# 1. Clone
 git clone https://github.com/swayammankar1-hub/FSD-Lab-Event-Management.git
 cd FSD-Lab-Event-Management/Event-Management-system
 ```
 
-### 2. Backend Setup
+**Backend** (terminal 1)
+
 ```bash
 cd server
 npm install
-```
-Create a `.env` file in `server/`:
-```env
-PORT=5000
-MONGODB_URI=your_mongodb_connection_string
-JWT_SECRET=your_jwt_secret
-JWT_EXPIRES_IN=1d
-CLIENT_ORIGIN=http://localhost:5173
-```
-Run backend:
-```bash
-npm run dev
+npm run dev          # nodemon on http://localhost:5000
 ```
 
-### 3. Frontend Setup
-In a new terminal:
+**Frontend** (terminal 2)
+
 ```bash
 cd client
 npm install
-```
-Create a `.env` file in `client/`:
-```env
-VITE_SOCKET_URL=http://localhost:5000
-```
-Run frontend:
-```bash
-npm run dev
+npm run dev          # Vite on http://localhost:5173
 ```
 
----
+| Script | Location | Purpose |
+| :--- | :--- | :--- |
+| `npm run dev` | server | Start API with auto-reload |
+| `npm start` | server | Start API (production) |
+| `npm run dev` | client | Start Vite dev server |
+| `npm run build` | client | Production build |
+| `npm run lint` | client | Run ESLint |
 
-## 📡 API Endpoints
+### Creating an Admin Account
 
-### Authentication
+For security, public registration **always** creates a `user`; a role is never accepted from request data. To create an admin:
+
+1. Register a normal account through the app.
+2. In MongoDB (Atlas UI or `mongosh`), change that user's role:
+
+```js
+db.users.updateOne({ email: "you@example.com" }, { $set: { role: "admin" } })
+```
+
+3. Log out and back in. The **Admin** dashboard is now available.
+
+## Application Routes
+
+| Path | Page | Access |
+| :--- | :--- | :--- |
+| `/` | Home | Public |
+| `/events` | Event discovery with search and filters | Public |
+| `/login` | Login | Public |
+| `/register` | Sign up | Public |
+| `/my-registrations` | Your bookings | Logged-in users |
+| `/admin` | Admin dashboard | Admins only |
+
+## API Reference
+
+Base path: `/api`. Protected routes expect the header `Authorization: Bearer <token>`.
+
+### Auth
+
 | Method | Endpoint | Description | Access |
 | :--- | :--- | :--- | :--- |
-| `POST` | `/api/auth/register` | Register a new user | Public |
-| `POST` | `/api/auth/login` | Login and receive JWT | Public |
-| `GET` | `/api/auth/me` | Verify token & return profile | Authenticated |
+| `POST` | `/auth/register` | Create an account | Public |
+| `POST` | `/auth/login` | Log in and receive a JWT | Public |
+| `GET` | `/auth/me` | Return the current user | Authenticated |
 
 ### Events
+
 | Method | Endpoint | Description | Access |
 | :--- | :--- | :--- | :--- |
-| `GET` | `/api/events` | List events with optional search/date filters | Public |
-| `GET` | `/api/events/:id` | Fetch specific event details | Public |
-| `POST` | `/api/events` | Create a new event | Admin Only |
-| `PUT` | `/api/events/:id` | Update an event | Admin Only |
-| `DELETE` | `/api/events/:id` | Cancel/delete an event | Admin Only |
+| `GET` | `/events` | List events. Query: `search`, `location`, `dateFrom`, `dateTo` | Public |
+| `GET` | `/events/:id` | Get one event | Public |
+| `POST` | `/events` | Create an event | Admin |
+| `PUT` | `/events/:id` | Update an event | Admin |
+| `DELETE` | `/events/:id` | Delete an event and its registrations | Admin |
 
 ### Registrations
+
 | Method | Endpoint | Description | Access |
 | :--- | :--- | :--- | :--- |
-| `POST` | `/api/registrations` | Book a seat for an event | User |
-| `GET` | `/api/registrations/me` | View personal event registrations | User |
-| `DELETE` | `/api/registrations/:id` | Cancel personal registration | User |
-| `GET` | `/api/registrations` | View all system registrations | Admin Only |
+| `POST` | `/registrations` | Register for an event | User |
+| `GET` | `/registrations/me` | List your registrations | User |
+| `DELETE` | `/registrations/:id` | Cancel a registration | User |
+| `GET` | `/registrations` | List all registrations | Admin |
 
----
+### System
 
-## 🔄 Real-Time Events (Socket.IO)
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `GET` | `/health` | Returns `{ "status": "ok" }` |
 
-| Event Name | Direction | Trigger | Payload |
+**Example**
+
+```bash
+curl -X POST http://localhost:5000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"you@example.com","password":"your-password"}'
+```
+
+## Real-Time Events (Socket.IO)
+
+| Event | Direction | Triggered when | Payload |
 | :--- | :--- | :--- | :--- |
-| `event:created` | Server &rarr; Client | Admin creates a new event | `{ message, event: { _id, title, date, location }, createdAt }` |
-| `event:updated` | Server &rarr; Client | Admin edits an event | `{ message, event: { _id, title, date, location }, createdAt }` |
-| `event:deleted` | Server &rarr; Client | Admin deletes an event | `{ message, event: { _id, title }, createdAt }` |
+| `event:created` | Server → Clients | An admin creates an event | `{ message, event: { _id, title, date, location }, createdAt }` |
+| `event:updated` | Server → Clients | An admin edits an event | `{ message, event: { _id, title, date, location }, createdAt }` |
+| `event:deleted` | Server → Clients | An admin deletes an event | `{ message, event: { _id, title }, createdAt }` |
 
----
+## Data Models
 
-## 🔄 CI/CD Pipeline (GitHub Actions)
+| Model | Fields | Notes |
+| :--- | :--- | :--- |
+| **User** | `name`, `email` (unique), `password` (hashed, not returned by default), `role` (`user` \| `admin`) | Timestamps enabled |
+| **Event** | `title`, `description`, `date`, `time` (`HH:MM`), `location`, `createdBy` → User | Indexed on date, location and a text index on title/description |
+| **Registration** | `user` → User, `event` → Event | Unique compound index on `(user, event)` prevents duplicate bookings |
 
-The workflow defined in [`.github/workflows/ci.yml`](.github/workflows/ci.yml) triggers automatically on every push or pull request to the `main` branch:
+## Security
 
-1. **Backend Code Verification:** Checks Node.js 20 environment, clean dependency installation (`npm ci`), and syntax check (`node -c server.js`).
-2. **Frontend Lint & Build:** Runs ESLint across all React components and verifies the production build (`npm run build`).
+- Passwords hashed with bcrypt; the password field is excluded from queries by default.
+- JWT verification middleware (`protect`) and role middleware (`adminOnly`) guard sensitive routes.
+- Roles are never read from registration requests.
+- CORS restricted to the configured `CLIENT_ORIGIN`.
+- Request body size limited to 100 KB.
+- User-supplied search and location text is regex-escaped before querying.
+- The server refuses to start when `JWT_SECRET` is missing.
 
----
+## CI/CD Pipeline
 
-## 👨‍💻 Author & Lab Details
+Defined in [`.github/workflows/ci.yml`](.github/workflows/ci.yml); runs on every push and pull request to `main`.
 
-* **Author:** Swayam Mankar
-* **Course:** Full Stack Development Lab (FSD Lab)
-* **Date:** 16/11/2026
+| Job | Steps |
+| :--- | :--- |
+| **Backend Code Verification** | Node 20 setup → `npm ci` → `node -c server.js` syntax check |
+| **Frontend Lint & Build** | Node 20 setup → `npm ci` → `npm run lint` → `npm run build` |
+
+## Deployment
+
+| Component | Platform | Configuration |
+| :--- | :--- | :--- |
+| **Backend** | Render (Docker / Node web service) | [`render.yaml`](render.yaml). Set `MONGODB_URI`, `JWT_SECRET` and `CLIENT_ORIGIN` in the dashboard. |
+| **Frontend** | Vercel | Root directory `Event-Management-system/client`. Set `VITE_API_URL` and `VITE_SOCKET_URL` to your backend URL. |
+
+> After deploying the backend, update the placeholder `https://YOUR-BACKEND.onrender.com` in [`client/vercel.json`](Event-Management-system/client/vercel.json) so API calls are proxied to your own server, and set `CLIENT_ORIGIN` on the backend to your Vercel URL.
+
+Live links (add yours after deploying):
+
+- Frontend: `https://YOUR-FRONTEND.vercel.app`
+- Backend: `https://YOUR-BACKEND.onrender.com`
+
+## Documentation
+
+Detailed lab reports live in [`docs/`](docs/README.md):
+
+- [Experiment 7: Real-Time Communication with Socket.IO](docs/EXPERIMENT_7_SOCKET_IO_REALTIME.md)
+- [Experiment 8: Containerization, CI/CD and Deployment](docs/EXPERIMENT_8_CONTAINERIZATION_AND_DEPLOYMENT.md)
+
+## Author
+
+**Swayam Mankar**
+Full Stack Development Lab (FSD Lab)
+
+[GitHub](https://github.com/swayammankar1-hub) · [LinkedIn](https://linkedin.com/in/swayam-mankar-989179320)
